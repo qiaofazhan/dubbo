@@ -30,6 +30,8 @@ import java.util.List;
 
 /**
  * StaticDirectory
+ *  qfz>   Directory 代表多个 Invoker，可以把它看成 List<Invoker>
+ * 是不会动态变化的,他的Invoker是通过构造函数传入,StaticDirectory用得比较少,主要用在服务对多注册中心的引用
  */
 public class StaticDirectory<T> extends AbstractDirectory<T> {
     private static final Logger logger = LoggerFactory.getLogger(StaticDirectory.class);

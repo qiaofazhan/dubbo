@@ -29,7 +29,9 @@ import java.util.List;
 import static org.apache.dubbo.rpc.cluster.Constants.INVOCATION_NEED_MOCK;
 import static org.apache.dubbo.rpc.cluster.Constants.MOCK_PROTOCOL;
 
-/**
+/** qfz> 应用场景:其实Router在应用隔离,读写分离,灰度发布中都有它的影子
+ * 一种特殊的路由器，用来实现模拟功能。
+ * 如果一个请求被配置为使用mock，那么这个路由器保证只有具有协议mock的invoker出现在最终的调用者列表中，所有其他invoker都将被排除。
  * A specific Router designed to realize mock feature.
  * If a request is configured to use mock, then this router guarantees that only the invokers with protocol MOCK appear in final the invoker list, all other invokers will be excluded.
  */

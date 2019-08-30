@@ -51,7 +51,9 @@ import static org.apache.dubbo.common.constants.CommonConstants.HOST_KEY;
 
 /**
  * ConditionRouter
- *
+ * qfz> 应用场景:其实Router在应用隔离,读写分离,灰度发布中都有它的影子
+ * ConditionRouter(条件路由),条件路由主要就是根据dubbo管理控制台配置的路由规则来过滤相关的invoker,
+ * 当我们对路由规则点击启用的时候,就会触发RegistryDirectory类的notify方法
  */
 public class ConditionRouter extends AbstractRouter {
     public static final String NAME = "condition";

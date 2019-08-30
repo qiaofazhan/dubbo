@@ -24,6 +24,7 @@ import org.apache.dubbo.rpc.cluster.Directory;
 /**
  * {@link FailbackClusterInvoker}
  *
+ * qfz>  失败自动恢复，后台记录失败请求，定时重发。通常用于消息通知操作。
  */
 public class FailbackCluster implements Cluster {
 

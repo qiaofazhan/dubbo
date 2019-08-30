@@ -48,6 +48,14 @@ import static org.apache.dubbo.rpc.cluster.Constants.TYPE_KEY;
 
 /**
  * ScriptRouter
+ * qfz> 应用场景:其实Router在应用隔离,读写分离,灰度发布中都有它的影子
+ *  脚本路由规则 支持 JDK 脚本引擎的所有脚本，
+ * 比如：javascript, jruby, groovy 等，通过 type=javascript 参数设置脚本类型，缺省为 javascript。
+ *
+ * 假如有这么个表达式如下:
+ * double d = (1+1-(2-4)*2)/24;//没有问题
+ * "(1+1-(2-4)*2)/24"//但是假如这个表达式是这样的字符串格式,或者更复杂的运算,那么你就不好处理了,
+ * 然后这个ScriptEngine类的eval方法就能很好处理这类字符串表达式的问题
  */
 public class ScriptRouter extends AbstractRouter {
     public static final String NAME = "SCRIPT_ROUTER";

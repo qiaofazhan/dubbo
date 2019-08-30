@@ -23,7 +23,13 @@ import org.apache.dubbo.rpc.cluster.Directory;
 
 /**
  * {@link FailoverClusterInvoker}
+ *qfz>  是dubbo里面容错方案的缺省值
+ *      失败自动切换，当出现失败，重试其它服务器。
+ *      通常用于读操作，但重试会带来更长延迟。可通过 retries="2" 来设置重试次数(不含第一次).
  *
+ *      面试会问,dubbo中"读接口"和"写接口"有什么区别?
+ *      答案也是很明显的,因为默认FailoverCluster会重试。
+ *      如果是"写"类型的接口,如果在网络抖动情况下写多次,所以"写"类型的接口要换成FailfastCluster
  */
 public class FailoverCluster implements Cluster {
 

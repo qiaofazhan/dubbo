@@ -24,6 +24,7 @@ import org.apache.dubbo.rpc.cluster.Directory;
 /**
  * {@link FailfastClusterInvoker}
  *
+ * qfz>  快速失败，只发起一次调用，失败立即报错。通常用于非幂等性的写操作，比如新增记录。
  */
 public class FailfastCluster implements Cluster {
 
@@ -31,6 +32,7 @@ public class FailfastCluster implements Cluster {
 
     @Override
     public <T> Invoker<T> join(Directory<T> directory) throws RpcException {
+        //qfz>  这个的实现应该是实现类里面最简单的,就是调用invoke,调用失败就抛出异常,但是这个却是面试问得最多的
         return new FailfastClusterInvoker<T>(directory);
     }
 

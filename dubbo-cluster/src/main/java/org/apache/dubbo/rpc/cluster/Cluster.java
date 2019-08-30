@@ -28,6 +28,9 @@ import org.apache.dubbo.rpc.cluster.support.FailoverCluster;
  * <a href="http://en.wikipedia.org/wiki/Computer_cluster">Cluster</a>
  * <a href="http://en.wikipedia.org/wiki/Fault-tolerant_system">Fault-Tolerant</a>
  *
+ *
+ * qfz>  Cluster 将 Directory 中的多个 Invoker 伪装成一个 Invoker，对上层透明，伪装过程包含了容错逻辑，调用失败后，重试另一个.
+ *      简单来说,就是应对出错情况采取的策略。查看其各个子类(9个)的实现
  */
 @SPI(FailoverCluster.NAME)
 public interface Cluster {

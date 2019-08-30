@@ -85,6 +85,9 @@ import static org.apache.dubbo.rpc.cluster.Constants.ROUTER_KEY;
 
 /**
  * RegistryDirectory
+ *
+ * qfz>   Directory 代表多个 Invoker，可以把它看成 List<Invoker> ,但与 List 不同的是，它的值可能是动态变化的，比如注册中心推送变更
+ * 它继承了NotifyListener，用于动态更改Invoker列表
  */
 public class RegistryDirectory<T> extends AbstractDirectory<T> implements NotifyListener {
 
@@ -205,6 +208,14 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         }
     }
 
+    /**
+     * qfz> notify方法就是注册中心的回调,也就是它之所以能根据注册中心动态变化的根源所在.
+     * 该方法动态更新Invoker列表（写操作）
+     *
+     * 为什么参数是List<Url>呢？
+     * 官网解释：所有配置最终都将转换为 URL 表示，并由服务提供方生成，经注册中心传递给消费方，各属性对应 URL 的参数，
+     * @param urls The list of registered information , is always not empty. The meaning is the same as the return value of {@link org.apache.dubbo.registry.RegistryService#lookup(URL)}.
+     */
     @Override
     public synchronized void notify(List<URL> urls) {
         Map<String, List<URL>> categoryUrls = urls.stream()
@@ -226,16 +237,19 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
         this.configurators = Configurator.toConfigurators(configuratorURLs).orElse(this.configurators);
 
         List<URL> routerURLs = categoryUrls.getOrDefault(ROUTERS_CATEGORY, Collections.emptyList());
+        //qfz 更新routers--->   url最终解析出来的是路由改变事件，则 更新更新routers
         toRouters(routerURLs).ifPresent(this::addRouters);
 
         // providers
         List<URL> providerURLs = categoryUrls.getOrDefault(PROVIDERS_CATEGORY, Collections.emptyList());
+        // qfz>  更新Invoker--->   url最终解析出来的是provider改变事件，则更新更新routers
         refreshOverrideAndInvoker(providerURLs);
     }
 
     private void refreshOverrideAndInvoker(List<URL> urls) {
         // mock zookeeper://xxx?mock=return null
         overrideDirectoryUrl();
+        //qfz>  --->更新Invoker
         refreshInvoker(urls);
     }
 
@@ -250,6 +264,13 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notify
      * </ol>
      *
      * @param invokerUrls this parameter can't be null
+     */
+    /*
+      qfz>  将url列表转换为Invoker Map,装换规则如下
+       1.如果url已经转换为Invoker，则不再重新引用，直接从缓存获取，注意如果url中任何一个参数变更也会重新引用
+       2.如果传入的url列表不为空，则表示最新的invoker列表（初始化）
+       3.如果传入的url列表为空，则表示下发的override规则或者route规则，需要重新交叉对比，决定是否要重新引用
+
      */
     // TODO: 2017/8/31 FIXME The thread pool should be used to refresh the address, otherwise the task may be accumulated.
     private void refreshInvoker(List<URL> invokerUrls) {

@@ -21,6 +21,11 @@ import org.apache.dubbo.rpc.RpcException;
 import org.apache.dubbo.rpc.cluster.Cluster;
 import org.apache.dubbo.rpc.cluster.Directory;
 
+/**
+ * qfz> 个主要用在分组聚合中,我们来看一下官网的介绍
+ *    官网介绍：按组合并返回结果 ，比如菜单服务，接口一样，但有多种实现，用group区分，
+ *    现在消费方需从每种group中调用一次返回结果，合并结果返回，这样就可以实现聚合菜单项。
+ */
 public class MergeableCluster implements Cluster {
 
     public static final String NAME = "mergeable";

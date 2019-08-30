@@ -24,6 +24,7 @@ import org.apache.dubbo.rpc.cluster.Directory;
 /**
  * AvailableCluster
  *
+ * qfz>  调用可用的.
  */
 public class AvailableCluster implements Cluster {
 
@@ -31,6 +32,7 @@ public class AvailableCluster implements Cluster {
 
     @Override
     public <T> Invoker<T> join(Directory<T> directory) throws RpcException {
+        //qfz ---->
         return new AvailableClusterInvoker<>(directory);
     }
 
