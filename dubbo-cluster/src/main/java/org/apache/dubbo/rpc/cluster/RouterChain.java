@@ -94,7 +94,8 @@ public class RouterChain<T> {
      * @return
      */
     public List<Invoker<T>> route(URL url, Invocation invocation) {
-        List<Invoker<T>> finalInvokers = invokers;
+        List<Invoker<T>> finalInvokers = invokers;//qfz>   ? Invokers是如何初始化的？
+        // qfz>  将上一步的全部invokers挑选出能正常执行的invokers
         for (Router router : routers) {
             finalInvokers = router.route(finalInvokers, url, invocation);
         }

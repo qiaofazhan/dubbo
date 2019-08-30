@@ -138,7 +138,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
                 return stickyInvoker;
             }
         }
-
+        //qfz>  负载均衡选择
         Invoker<T> invoker = doSelect(loadbalance, invocation, invokers, selected);
 
         if (sticky) {
@@ -156,6 +156,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
         if (invokers.size() == 1) {
             return invokers.get(0);
         }
+        //负载均衡选择
         Invoker<T> invoker = loadbalance.select(invokers, getUrl(), invocation);
 
         //If the `invoker` is in the  `selected` or invoker is unavailable && availablecheck is true, reselect.
@@ -242,9 +243,22 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
             ((RpcInvocation) invocation).addAttachments(contextAttachments);
         }
 
+        //qfz>   获取满足条件的执行的Invoker列表！（router）
         List<Invoker<T>> invokers = list(invocation);
+        //qfz> 加载该Invoker对应的负载均衡器（注意还没有进行负载均衡），dubbo允许对各个接口自定义负载均衡策略
         LoadBalance loadbalance = initLoadBalance(invokers, invocation);
         RpcUtils.attachInvocationIdIfAsync(getUrl(), invocation);
+        /*
+            在集群调用失败时，Dubbo 提供了多种容错方案，缺省为 failover 重试.
+            所以接下来doInvoke到了FailoverClusterInvoker类。
+            但是如果你配置的是Failfast Cluster(快速失败),
+            Failsafe Cluster(失败安全),
+            Failback Cluster(失败自动恢复),
+            Forking Cluster(并行调用多个服务器，只要一个成功即返回),
+            Broadcast Cluster(广播调用所有提供者，逐个调用，任意一台报错则报错)他也会到达相应的类。
+
+
+         */
         return doInvoke(invocation, invokers, loadbalance);
     }
 
@@ -277,6 +291,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
                                        LoadBalance loadbalance) throws RpcException;
 
     protected List<Invoker<T>> list(Invocation invocation) throws RpcException {
+        //qfz>  从目录资源中获取   --->AbstractDrectory
         return directory.list(invocation);
     }
 
@@ -293,6 +308,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
      */
     protected LoadBalance initLoadBalance(List<Invoker<T>> invokers, Invocation invocation) {
         if (CollectionUtils.isNotEmpty(invokers)) {
+            // qfz>  多种负载均衡策略
             return ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(invokers.get(0).getUrl()
                     .getMethodParameter(RpcUtils.getMethodName(invocation), LOADBALANCE_KEY, DEFAULT_LOADBALANCE));
         } else {

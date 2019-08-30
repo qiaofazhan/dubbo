@@ -81,7 +81,7 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
         if (destroyed) {
             throw new RpcException("Directory already destroyed .url: " + getUrl());
         }
-
+        // qfz>   --->RegistryDirectory
         return doList(invocation);
     }
 

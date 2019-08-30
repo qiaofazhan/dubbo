@@ -24,12 +24,12 @@ import org.apache.dubbo.rpc.RpcInvocation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-/**
+/**qfz>  生成的ServiceReference（invoker）代理类,使用的是jdk动态代理
  * InvokerHandler
  */
 public class InvokerInvocationHandler implements InvocationHandler {
     private static final Logger logger = LoggerFactory.getLogger(InvokerInvocationHandler.class);
-    private final Invoker<?> invoker;
+    private final Invoker<?> invoker;//qfz> 要代理的Invoker
 
     public InvokerInvocationHandler(Invoker<?> handler) {
         this.invoker = handler;
@@ -40,7 +40,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
         String methodName = method.getName();
         Class<?>[] parameterTypes = method.getParameterTypes();
         if (method.getDeclaringClass() == Object.class) {
-            return method.invoke(invoker, args);
+            return method.invoke(invoker, args);//qfz> 如果是，Object类中定义的方法并且没有被重写，则直接执行
         }
         if ("toString".equals(methodName) && parameterTypes.length == 0) {
             return invoker.toString();
@@ -51,7 +51,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
         if ("equals".equals(methodName) && parameterTypes.length == 1) {
             return invoker.equals(args[0]);
         }
-
+        //qfz>  执行Invoker的核心方法（RPC）   --->MockClusterInvoker
         return invoker.invoke(new RpcInvocation(method, args)).recreate();
     }
 }
