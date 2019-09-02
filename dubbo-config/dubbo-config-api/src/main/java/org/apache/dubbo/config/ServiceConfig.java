@@ -375,6 +375,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (shouldDelay()) {
             DELAY_EXPORT_EXECUTOR.schedule(this::doExport, getDelay(), TimeUnit.MILLISECONDS);
         } else {
+            //qfz>  ---->
             doExport();
         }
     }
@@ -412,6 +413,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         if (StringUtils.isEmpty(path)) {
             path = interfaceName;
         }
+        //qfz>  ---->
         doExportUrls();
     }
 
@@ -449,11 +451,14 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void doExportUrls() {
+        //qfz> ---->加载dubbo默认配置文件（缺省为classpath跟目录下的dubbo.properties）,可以通过-Ddubbo.properties.file=xxx.properties指定
         List<URL> registryURLs = loadRegistries(true);
         for (ProtocolConfig protocolConfig : protocols) {
+            //qfz> ----> 这里为什么会进行遍历呢,因为dubbo是支持多协议的
             String pathKey = URL.buildKey(getContextPath(protocolConfig).map(p -> p + "/" + path).orElse(path), group, version);
             ProviderModel providerModel = new ProviderModel(pathKey, ref, interfaceClass);
             ApplicationModel.initProviderModel(pathKey, providerModel);
+            //qfz>  ----->服务发布的重点
             doExportUrlsFor1Protocol(protocolConfig, registryURLs);
         }
     }
@@ -568,14 +573,27 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         }
 
         String scope = url.getParameter(SCOPE_KEY);
+        /*qfz>
+        为什么会有本地暴露和远程暴露呢?在dubbo中我们一个服务可能既是Provider,又是Consumer.
+         因此就存在他自己调用自己服务的情况,如果再通过网络去访问,那自然是舍近求远,因此他是有本地暴露服务的这个设计.
+         从这里我们就知道这个两者的区别
+             •本地暴露是暴露在JVM中,不需要网络通信.
+             •远程暴露是将ip,端口等信息暴露给远程客户端,调用时需要网络通信.
+
+
+         */
         // don't export when none is configured
+        //qfz> 配置为nono则不暴露
         if (!SCOPE_NONE.equalsIgnoreCase(scope)) {
 
             // export to local if the config is not remote (export to remote only when config is remote)
             if (!SCOPE_REMOTE.equalsIgnoreCase(scope)) {
+                //qfz>  配置为remote则只做远程暴露
+                //qfz>  配置不为remote则只本地暴露
                 exportLocal(url);
             }
             // export to remote if the config is not local (export to local only when config is local)
+            //qfz>  配置不为local，则暴露为远程服务
             if (!SCOPE_LOCAL.equalsIgnoreCase(scope)) {
                 if (!isOnlyInJvm() && logger.isInfoEnabled()) {
                     logger.info("Export dubbo service " + interfaceClass.getName() + " to url " + url);

@@ -111,6 +111,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
             if (logger.isInfoEnabled()) {
                 logger.info("The service ready on spring started. service: " + getInterface());
             }
+            // qfz> dubbo配置加载入口
             export();
         }
     }
@@ -333,6 +334,7 @@ public class ServiceBean<T> extends ServiceConfig<T> implements InitializingBean
      */
     @Override
     public void export() {
+        //qfz>  ---->
         super.export();
         // Publish ServiceBeanExportedEvent
         publishExportEvent();
