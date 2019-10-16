@@ -25,6 +25,9 @@ import org.apache.dubbo.rpc.cluster.Directory;
  * AvailableCluster
  *
  * qfz>  调用可用的.
+ * 遍历可用的invoker，返回第一个。（这里的可用只是表示provider未下线）。基本就是invoker列表。FailoverCluster是直接切换到其他的。遍历可用的invoker，返回第一个。（这里的可用只是表示provider未下线）。
+ * 基本就是invoker列表。
+ * FailoverCluster是直接切换到其他的。
  */
 public class AvailableCluster implements Cluster {
 
